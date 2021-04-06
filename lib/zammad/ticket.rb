@@ -13,11 +13,7 @@ module Zammad
 
             response = Faraday.get url, params, headers
 
-            if response.success?
-                JSON.parse(response.body)
-            else
-                nil
-            end
+            [response.success?, JSON.parse(response.body)]
         end
 
         def self.create(params)
@@ -29,8 +25,7 @@ module Zammad
         
             response = Faraday.post url, params, headers
 
-            raise response.inspect unless response.success? 
-            JSON.parse(response.body)
+            [response.success?, JSON.parse(response.body)]
         end
 
 
@@ -39,7 +34,7 @@ module Zammad
             when 'Novo'
                 1 # new
             when 'Cancelado'
-                11 # canceld
+                8 # canceld
             when 'Fechado'
                 4 # closed
             else

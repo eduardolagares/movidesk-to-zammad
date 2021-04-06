@@ -7,9 +7,12 @@ namespace :movidesk do
                 page = 1
                 loop do
                     puts "Consultado tickets. Página #{page}"
-                    tickets = Movidesk::Ticket.fetch({ "$skip": skip})
+                    success, tickets = Movidesk::Ticket.fetch({ "$skip": skip})
+
+                    # binding.pry
+                    raise "Não foi possível consultar os tickets" unless success
                     
-                    break if tickets == [] || tickets == nil
+                    break if tickets == []
 
                     filename = "./exported/movidesk-tickets-page-#{page}.json"
 

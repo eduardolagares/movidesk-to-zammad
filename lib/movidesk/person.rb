@@ -6,14 +6,12 @@ module Movidesk
 
             params[:token] = ENV['MOVIDEKS_API_KEY']
             params["$orderby"] = 'businessName'
+            params["$select"] = "id,businessName,emails"
+            params["$expand"] = "emails($select=email,isDefault)"
            
             response = Faraday.get url, params
 
-            if response.success?
-                JSON.parse(response.body)
-            else
-                nil
-            end
+            [response.success?, JSON.parse(response.body)]
         end
     end
 end

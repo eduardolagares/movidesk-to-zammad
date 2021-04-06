@@ -2,42 +2,77 @@
 
 Conjunto de TASKS para efetuar a migração de dados do MOVIDESK para o ZAMMAD.
 
-# MOVIDESK
 
-## Export
+# ETAPAS
 
-> bundle exec rake movidesk:export:to_json
-> bundle exec rake movidesk:export:peaple:to_json
+## EXPORTAÇÃO
+
+### ETAPA 1
+
+Faça uma cópia do arquivo .env.example par a.env e o preencha corretamente as variáveis do Movidesk.
+
+### ETAPA 2
+
+Faça a exportação dos dados do movidesk para os arquivos json
+
 > bundle exec rake movidesk:export:tickets:to_json
 
 
-# ZAMMAD
+## IMPORTAÇÃO
 
-Siga os seguintes passos para efetuar a migração:
+### ETAPA 1 - .env
 
-## Verifique se você precisa criar algum status novo, se sim, o código abaixo auxilia na criação dentro do rails console
+Gere um tokem de acesso ao Zammad (http://localhost:8080/#profile/token_access) e cole ele na variável ZAMMAD_API_KEY do .env . Verifique também se a variável ZAMMAD_API_BASE_URL está configurada corretamente. 
 
-> Ticket::State.create!(name: 'Canceled', state_type_id: 5, updated_by_id: 1, created_by_id: 1)
+Verifique se você configurou corretamente as variáveis do Zammad no arquivo .env 
 
-## Mapear status
+### ETAPA 2 - Status customizados
 
-Faça o mapeamento dos status novos no método Zammad::Ticket.map_status
+Crie os status que existem no Movidesk mas não existem no Zammad. 
 
-## Crie os seguintes campos customizados
+Obs: Você pode alterar essa task para gerar quantos status desejar.
 
-> Objetos -> Chamado > movidesk_ticket_identificador (integer (maximal 10000000000000000))
-> Objetos -> Usuario > identificador_movidesk (integer (maximal 10000000000000000))
+> bundle exec rake zammad:create_ticket_custom_states
 
-## Importação
+### ETAPA 3 - Mapeamento de status
 
-Importação total
+Faça o mapeamento dos novos status no método Zammad::Ticket.map_status
 
-> bundle exec rake movidesk:import:from_json
+### ETAPA 4 - Campos customizados
 
-Importação de pessoas
+Crie os campos customizados necessários para a importação
 
-> bundle exec rake movidesk:import:peaple:from_json
+> bundle exec rake zammad:create_custom_fields
 
-Importação de tickets
+Após criar os campos acesse seu zammad. Vá em config, objects e conceda as permissões de shown para os novos campos. Concluíndo clique no botão upgrade database e depois reinicie o Zammad.
 
-> bundle exec rake movidesk:import:tickets:from_json
+Obs: Este passo cria os campos que serão utilizados para vincular ticket e clientes do zammad aos tickets e clientes do movidesk.
+
+### ETAPA 5 - Colocando zammad em modo importação
+
+Coloque o Zammad em modo de importação para respeitar as datas de criação dos tickets e clientes. 
+
+Obs: Este comando deve ser executado no rails console do seu Zammad.
+
+> Setting.set('import_mode', true)
+
+Se vc está rodando com docker-compose, para iniciar o rails console execute:
+
+> docker-compose exec zammad-railsserver rails c
+
+### ETAPA 6 - Executando
+
+Execute o comando a seguir para iniciar a importação dos tickets.
+
+> bundle exec rake zammad:import:tickets:from_json start_page=1 total_pages=1 group_id=1
+
+Parâmetros:
+
+* start_page: Este é o número da página que deseja iniciar a importação, permitindo que vc comece ou retome a partir de uma página específica.
+* total_pages: Total de páginas que serão processadas. Você pode colocar o número de arquivos json gerados na exportação
+* group_id: Este é o id do grupo em que os usuários serão incluídos. Por padrão é o grupo default Users 1, mas você pode alterar.
+
+Observações:
+
+* Durante a importação do ticket o cliente também é importado.
+* Caso o cliente não possua um e-mail válido, um e-mail é formado para ele combinad com o id no movidesk. Ex. movidesk-cliente-importado-123123123@baladapp.com.br"

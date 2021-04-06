@@ -1,12 +1,11 @@
 module Zammad
-    class User
-        def self.search(email)
-            url = "#{ENV['ZAMMAD_API_BASE_URL']}users/search"
+    class TicketArticle
+        def self.fetch_by_ticket(ticket_id)
+            url = "#{ENV['ZAMMAD_API_BASE_URL']}ticket_articles/by_ticket/#{ticket_id}"
             headers = {
                 'Authorization': "Token token=#{ENV['ZAMMAD_API_KEY']}"
             }
             params = {
-                query: email,
                 limit: 1,
                 expand: true
             }
@@ -17,14 +16,29 @@ module Zammad
         end
 
         def self.create(params)
-            url = "#{ENV['ZAMMAD_API_BASE_URL']}users"
+            url = "#{ENV['ZAMMAD_API_BASE_URL']}ticket_articles"
 
             headers = {
                 'Authorization': "Token token=#{ENV['ZAMMAD_API_KEY']}"
             }
         
             response = Faraday.post url, params, headers
+
             [response.success?, JSON.parse(response.body)]
         end
+
+        def self.update(data)
+            url = "#{ENV['ZAMMAD_API_BASE_URL']}ticket_articles/#{data["id"]}"
+
+            headers = {
+                'Authorization': "Token token=#{ENV['ZAMMAD_API_KEY']}"
+            }
+        
+            response = Faraday.put url, data, headers
+
+            [response.success?, JSON.parse(response.body)]
+        end
+
+
     end
 end

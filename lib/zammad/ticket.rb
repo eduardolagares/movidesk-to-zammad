@@ -39,6 +39,8 @@ module Zammad
                 4 # closed
             when 'Resolvido'
                 11
+            when 'Em andamento'
+                12
             else
                 raise "O status #{movidesk_status} não foi mapeado em Zammad::Ticket.map_status"
             end

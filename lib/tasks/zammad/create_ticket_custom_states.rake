@@ -19,6 +19,14 @@ namespace :zammad do
           "note": "Status Resolvido"
         })
 
+        success_field1, result_field1 = Zammad::TicketState.create({
+          "name": "Em atendimento",
+          "state_type_id": 2,
+          "ignore_escalation": true,
+          "active": true,
+          "note": "Status Em atendimento"
+        })
+
 
         
         raise "Não foi possível criar o TicketState. #{result_field1.inspect}" unless success_field1

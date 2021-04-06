@@ -10,6 +10,7 @@ namespace :zammad do
                 start_page = ENV["start_page"].to_i
                 total_pages = ENV["total_pages"].to_i
                 group_id = ENV["group_id"].to_i
+                start_index = ENV["start_index"].to_i
                 movidesk_id_field_name = ENV['ZAMMAD_MOVIDEKS_ID_FIELD_NAME']
 
                 export_path = './exported/'
@@ -18,6 +19,7 @@ namespace :zammad do
                     start_page: start_page, 
                     total_pages: total_pages, 
                     group_id: group_id, 
+                    start_index: start_index,
                     movidesk_id_field_name: movidesk_id_field_name, 
                     export_path: export_path
                 })

@@ -16,3 +16,5 @@ gem "interactor", "~> 3.1"
 gem "down", "~> 5.2"
 
 gem "mime-types", "~> 3.3"
+
+gem "ruby-filemagic", "~> 0.7.2"

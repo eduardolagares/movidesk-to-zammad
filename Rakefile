@@ -25,6 +25,7 @@ require 'thread/pool'
 require "down"
 require "base64"
 require 'mime/types'
+require 'filemagic'
 
 
 
@@ -35,7 +36,6 @@ import "./lib/tasks/movidesk/export/tickets/to_json.rake"
 import "./lib/tasks/movidesk/export/export.rake"
 
 
-import "./lib/tasks/zammad/import/peaple/from_json.rake"
 import "./lib/tasks/zammad/import/tickets/from_json.rake"
 import "./lib/tasks/zammad/import/import.rake"
 import "./lib/tasks/zammad/create_custom_fields.rake"

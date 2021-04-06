@@ -43,17 +43,19 @@ module Zammad
             url = ENV["MOVIDESK_ATTACHEMENTS_BASE_URL"] + filename
             tempfile = Down.download(url)
             data = File.open(tempfile).read
-            Base64.encode64(data)
+            [Base64.encode64(data), tempfile]
         end
 
-        def get_mimetype_from_filename(filename)
-            return "text/plain" if filename == "text.plain"
+        def get_mimetype_from_filename(file)
+            type = nil
 
-            type = MIME::Types.type_for(filename)
+            FileMagic.open(:mime) do |fm|
+                type = fm.file(file.path)
+            end
 
-            context.fail!(message: "impossível identificar o mimetype do arquivo #{filename}") if type.size.zero?
-            
-            type.first&.content_type
+            context.fail!(message: "impossível identificar o mimetype do arquivo #{file}") if type.nil?
+           
+            type
         end
 
         def create_ticket_article_in_zammad(action)
@@ -67,6 +69,7 @@ module Zammad
             zammad_user ||= create_user_in_zammad(article_creator_id, article_creator_email, article_creator_name, article_creator_created_at)
 
             changed, attachments = build_attachments_array_from_movidesk_attachments(action["attachments"], [])
+
             success, result = Zammad::TicketArticle.create({
                 ticket_id: context.zammad_ticket_id,
                 subject: "movidesk_action_id:#{action["id"]}",
@@ -154,11 +157,11 @@ module Zammad
                 result = current_attachments
 
                 new_attachments.each do |new_attacment|
-                    base64_content = download_attachement(new_attacment["path"])
+                    base64_content, tempfile = download_attachement(new_attacment["path"])
                     result << {
                         filename: build_zammad_attachment_filename(new_attacment),
                         data: base64_content,
-                        "mime-type": get_mimetype_from_filename(new_attacment["fileName"])
+                        "mime-type": get_mimetype_from_filename(tempfile)
                     }
                 end
             end
@@ -185,7 +188,8 @@ module Zammad
                     internal: first_action.dig("type") == 1,
                     # created_at: context.movidesk_ticket["createdDate"],
                     created_at: first_action["createdDate"],
-                    type: first_action["type"] == 1 ? 'note' : 'email'
+                    type: first_action["type"] == 1 ? 'note' : 'email',
+                    subject: "movidesk_action_id:#{first_action["id"]}",
                 },
                 attachments: attachments,
                 created_at: context.movidesk_ticket["createdDate"]

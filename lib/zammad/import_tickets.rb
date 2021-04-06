@@ -6,7 +6,7 @@ module Zammad
             
             validar_parametros
 
-
+            page = context.start_page
             while context.start_page <= context.max_pages
                 file_path = context.export_path + "movidesk-tickets-page-#{context.start_page}.json"
                 file = File.read(file_path)
@@ -14,14 +14,18 @@ module Zammad
 
                 puts "Importando #{tickets.size} tickets"
 
-                loop_count = 1
+                loop_count = 0
                 tickets.each do |ticket|
+                    loop_count += 1
+                    next if context.start_index.to_i > loop_count
+                    
+                    puts "LOOP #{loop_count}"
                     
                     import_ticket_result = Zammad::ImportTicket.call(ticket: ticket, group_id: context.group_id, movidesk_id_field_name: context.movidesk_id_field_name)
                     
                     context.fail!(message: import_ticket_result.message) unless import_ticket_result.success?
                     
-                    loop_count += 1
+                    
                 end
 
                 page += 1

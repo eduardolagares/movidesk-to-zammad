@@ -19,7 +19,7 @@ require 'faraday'
 require 'json'
 require 'pry'
 require 'json'
-require 'CSV'
+require 'csv'
 require 'benchmark'
 require 'thread/pool'
 require "down"

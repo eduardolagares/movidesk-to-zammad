@@ -15,7 +15,7 @@ namespace :zammad do
 
                 export_path = './exported/'
                 
-                zammad_tickets_importer = Zammad::ImportTickets.new({
+                result = Zammad::ImportTickets.call({
                     start_page: start_page, 
                     total_pages: total_pages, 
                     group_id: group_id, 
@@ -23,9 +23,7 @@ namespace :zammad do
                     movidesk_id_field_name: movidesk_id_field_name, 
                     export_path: export_path
                 })
-
-                result = zammad_tickets_importer.call
-
+                
                 raise result.message unless result.success?
                     
 

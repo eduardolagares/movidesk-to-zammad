@@ -6,13 +6,14 @@ module Zammad
             
             validar_parametros
 
-            page = context.start_page
             while context.start_page <= context.max_pages
                 file_path = context.export_path + "movidesk-tickets-page-#{context.start_page}.json"
                 file = File.read(file_path)
                 tickets = JSON.parse(file)
 
-                puts "Importando #{tickets.size} tickets"
+                puts "===================================================================================================="
+                puts "Importando #{tickets.size} tickets da página #{context.start_page}"
+                puts "===================================================================================================="
 
                 loop_count = 0
                 tickets.each do |ticket|
@@ -28,7 +29,8 @@ module Zammad
                     
                 end
 
-                page += 1
+                context.start_page += 1
+                context.start_index = 0
 
             end
         end

@@ -6,6 +6,7 @@ module Zammad
             
             validar_parametros
 
+
             while context.start_page <= context.max_pages
                 file_path = context.export_path + "movidesk-tickets-page-#{context.start_page}.json"
                 file = File.read(file_path)
@@ -29,8 +30,9 @@ module Zammad
                     
                 end
 
-                context.start_page += 1
+                context.total_pages -= 1
                 context.start_index = 0
+                context.start_page += 1 if context.total_pages > 0
 
             end
         end

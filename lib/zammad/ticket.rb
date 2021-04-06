@@ -37,6 +37,8 @@ module Zammad
                 8 # canceld
             when 'Fechado'
                 4 # closed
+            when 'Resolvido'
+                11
             else
                 raise "O status #{movidesk_status} não foi mapeado em Zammad::Ticket.map_status"
             end

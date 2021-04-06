@@ -29,9 +29,8 @@ module Zammad
 
                 context.total_pages -= 1
                 context.start_index = 0
-                context.start_page += 1 if context.total_pages > 0
+                context.start_page += 1
 
-                break if context.total_pages = 0
             end
         end
 
